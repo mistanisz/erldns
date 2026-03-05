@@ -48,7 +48,7 @@ encode_message(Response, Opts) ->
         M -> M
       catch
         Exception:Reason ->
-          lager:error("Error encoding ~p (~p:~p)", [Response, Exception, Reason]),
+          logger:error("Error encoding ~p (~p:~p)", [Response, Exception, Reason]),
           encode_message(build_error_response(Response))
       end
   end.

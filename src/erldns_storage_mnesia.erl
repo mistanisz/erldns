@@ -40,7 +40,7 @@ create(schema) ->
   ok = ensure_mnesia_started(),
   case erldns_config:storage_dir() of
     undefined ->
-      lager:error("You need to add a directory for mnesia in erldns.config");
+      logger:error("You need to add a directory for mnesia in erldns.config");
     Dir ->
       ok = filelib:ensure_dir(Dir),
       ok = application:set_env(mnesia, dir, Dir)
@@ -49,11 +49,11 @@ create(schema) ->
     ok ->
       ok;
     {error, Reason} ->
-      lager:warning("Could not stop mnesia for reason ~p~n", [Reason])
+      logger:warning("Could not stop mnesia for reason ~p~n", [Reason])
   end,
   case mnesia:create_schema([node()]) of
     {error, {_, {already_exists, _}}} ->
-      lager:warning("The schema already exists on node ~p.~n", [node()]),
+      logger:warning("The schema already exists on node ~p.~n", [node()]),
       ok;
     ok ->
       ok
@@ -73,7 +73,7 @@ create(zones) ->
                             {record_name, zone},
                             {disc_copies, [node()]}]) of
     {aborted, {already_exists, zones}} ->
-      lager:warning("The zone table already exists on node ~p.~n",
+      logger:warning("The zone table already exists on node ~p.~n",
                     [node()]),
       ok;
     {atomic, ok} ->
@@ -87,7 +87,7 @@ create(authorities) ->
                            [{attributes, record_info(fields, authorities)},
                             {disc_copies, [node()]}]) of
     {aborted, {already_exists, authorities}} ->
-      lager:warning("The authority table already exists on node ~p.~n",
+      logger:warning("The authority table already exists on node ~p.~n",
                     [node()]),
       ok;
     {atomic, ok} ->

@@ -65,7 +65,7 @@ throttle(Message, {_, Host}) ->
         end
       end,
       begin
-        %lager:debug("Throttle not enabled"),
+        %logger:debug("Throttle not enabled"),
         ok
       end).
 

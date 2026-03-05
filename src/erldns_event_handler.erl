@@ -35,7 +35,7 @@ handle_event(start_servers, State) ->
   case State#state.servers_running of
     false ->
       % Start up the UDP and TCP servers
-      lager:info("Starting the UDP and TCP supervisor"),
+      logger:info("Starting the UDP and TCP supervisor"),
       erldns_server_sup:start_link(),
       erldns_events:notify(servers_started),
       {ok, State#state{servers_running = true}};
@@ -67,13 +67,13 @@ handle_event({tcp_error, Reason}, State) ->
 handle_event({refused_response, Questions}, State) ->
   folsom_metrics:notify({refused_response_meter, 1}),
   folsom_metrics:notify({refused_response_counter, {inc, 1}}),
-  lager:debug("Refused response: ~p", [Questions]),
+  logger:debug("Refused response: ~p", [Questions]),
   {ok, State};
 
 handle_event({empty_response, Message}, State) ->
   folsom_metrics:notify({empty_response_meter, 1}),
   folsom_metrics:notify({empty_response_counter, {inc, 1}}),
-  lager:info("Empty response: ~p", [Message]),
+  logger:info("Empty response: ~p", [Message]),
   {ok, State};
 
 handle_event({dnssec_request, _Host, _Qname}, State) ->

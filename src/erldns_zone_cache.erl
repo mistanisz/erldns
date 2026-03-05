@@ -212,7 +212,7 @@ init([]) ->
 % gen_server callbacks
 
 handle_call(Message, _From, State) ->
-  lager:debug("Received unsupported call: ~p", [Message]),
+  logger:debug("Received unsupported call: ~p", [Message]),
   {reply, ok, State}.
 
 handle_cast({delete, Name}, State) ->
@@ -220,7 +220,7 @@ handle_cast({delete, Name}, State) ->
   {noreply, State};
 
 handle_cast(Message, State) ->
-  lager:debug("Received unsupported cast: ~p", [Message]),
+  logger:debug("Received unsupported cast: ~p", [Message]),
   {noreply, State}.
 
 handle_info(_Message, State) ->
@@ -281,7 +281,7 @@ build_named_index([R|Rest], Idx) ->
 sign_zone(Zone = #zone{keysets = []}) ->
   Zone;
 sign_zone(Zone) ->
-  lager:debug("Signing zone ~p", [Zone#zone.name]),
+  logger:debug("Signing zone ~p", [Zone#zone.name]),
   DnskeyRRs = lists:filter(erldns_records:match_type(?DNS_TYPE_DNSKEY), Zone#zone.records),
   KeyRRSigRecords = lists:flatten(lists:map(erldns_dnssec:key_rrset_signer(Zone#zone.name, DnskeyRRs), Zone#zone.keysets)),
 
@@ -293,16 +293,16 @@ sign_zone(Zone) ->
 
 -spec(verify_zone(erldns:zone(), [dns:rr()], [dns:rr()]) -> boolean()).
 verify_zone(Zone, DnskeyRRs, KeyRRSigRecords) ->
-  lager:debug("Verify zone ~p", [Zone#zone.name]),
+  logger:debug("Verify zone ~p", [Zone#zone.name]),
   case lists:filter(fun(RR) -> RR#dns_rr.data#dns_rrdata_dnskey.flags =:= 257 end, DnskeyRRs) of
     [] -> false;
     KSKs -> 
-      lager:debug("KSKs: ~p", [KSKs]),
+      logger:debug("KSKs: ~p", [KSKs]),
       KSKDnskey = lists:last(KSKs),
       RRSig = lists:last(KeyRRSigRecords),
-      lager:debug("Attempting to verify RRSIG with ~p", [KSKDnskey]),
+      logger:debug("Attempting to verify RRSIG with ~p", [KSKDnskey]),
       VerifyResult = dnssec:verify_rrsig(RRSig, DnskeyRRs, [KSKDnskey], []),
-      lager:debug("KSK verified? ~p", [VerifyResult]),
+      logger:debug("KSK verified? ~p", [VerifyResult]),
       VerifyResult
   end.
 
