@@ -90,7 +90,7 @@ handle_tcp_dns_query(Socket, <<_Len:16, Bin/binary>>) ->
   end;
 
 handle_tcp_dns_query(Socket, BadPacket) ->
-  logger:error("Received bad packet ~p", BadPacket),
+  logger:error("Received bad packet ~p", [BadPacket]),
   gen_tcp:close(Socket).
 
 handle_decoded_tcp_message(DecodedMessage, Socket, Address) ->
